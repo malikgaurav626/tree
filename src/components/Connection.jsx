@@ -3,11 +3,11 @@ import { useLoader } from "@react-three/fiber";
 import { TextureLoader, RepeatWrapping } from "three";
 import anime from "animejs";
 
-const VINE_TEXTURE_URL = "/public/vine-texture.png"; // Global texture URL
+const VINE_TEXTURE_URL = "/green-vine-texture.png"; // No /public in path
 
 const Connection = ({ parent, child }) => {
   const vineTexture = useLoader(TextureLoader, VINE_TEXTURE_URL);
-  const [animatedPositions, setAnimatedPositions] = useState(null);
+  const [animatedPoints, setAnimatedPoints] = useState(null);
 
   useEffect(() => {
     if (!parent || !child) return;
@@ -16,73 +16,62 @@ const Connection = ({ parent, child }) => {
     const midPos = [parent.axis * 10, -child.level * 10, 0];
     const childPos = [child.axis * 10, -child.level * 10, 0];
 
-    const initialPoints = [parentPos, parentPos, parentPos];
-    setAnimatedPositions(initialPoints);
+    const initial = [parentPos, parentPos, parentPos];
+    setAnimatedPoints(initial);
 
     anime({
-      targets: initialPoints,
+      targets: initial,
       duration: 1000,
       easing: "easeInOutQuad",
-      update: function (anim) {
-        const progress = anim.progress / 100;
-        initialPoints[1] = [
+      update: (anim) => {
+        const p = anim.progress / 100;
+        initial[1] = [
           parentPos[0],
-          parentPos[1] + (midPos[1] - parentPos[1]) * progress,
+          parentPos[1] + (midPos[1] - parentPos[1]) * p,
           0,
         ];
-        initialPoints[2] = [
-          parentPos[0] + (childPos[0] - parentPos[0]) * progress,
+        initial[2] = [
+          parentPos[0] + (childPos[0] - parentPos[0]) * p,
           midPos[1],
           0,
         ];
-        setAnimatedPositions([...initialPoints]);
+        setAnimatedPoints([...initial]);
       },
     });
   }, [parent, child]);
 
-  if (!parent || !child || !animatedPositions) return null;
+  if (!animatedPoints) return null;
 
-  // Texture adjustments
   vineTexture.wrapS = RepeatWrapping;
   vineTexture.wrapT = RepeatWrapping;
-  vineTexture.repeat.set(1, 5); // Adjust tiling for vines
-  vineTexture.offset.set(0.2, 0); // Adjust this to pick one vine from the texture
+  vineTexture.repeat.set(1, 5 / 2);
+  vineTexture.offset.set(0.2, 0);
+
+  const [p1, p2, p3] = animatedPoints;
+
+  const verticalLength = Math.abs(p1[1] - p2[1]);
+  const horizontalLength = Math.abs(p2[0] - p3[0]);
 
   return (
     <>
-      {/* Vertical Vine */}
-      <mesh
-        position={[
-          animatedPositions[0][0],
-          (animatedPositions[0][1] + animatedPositions[1][1]) / 2,
-          0,
-        ]}
-      >
-        <planeGeometry
-          args={[
-            0.5,
-            Math.abs(animatedPositions[0][1] - animatedPositions[1][1]),
-          ]}
-        />
-        <meshBasicMaterial map={vineTexture} transparent />
-      </mesh>
+      {/* Vertical vine */}
+      {verticalLength > 0 && (
+        <mesh position={[p1[0], (p1[1] + p2[1]) / 2, 0]} rotation={[0, 0, 0]}>
+          <planeGeometry args={[2.5, verticalLength]} />
+          <meshBasicMaterial map={vineTexture} transparent />
+        </mesh>
+      )}
 
-      {/* Horizontal Vine */}
-      <mesh
-        position={[
-          (animatedPositions[1][0] + animatedPositions[2][0]) / 2,
-          animatedPositions[1][1],
-          0,
-        ]}
-      >
-        <planeGeometry
-          args={[
-            Math.abs(animatedPositions[1][0] - animatedPositions[2][0]),
-            0.5,
-          ]}
-        />
-        <meshBasicMaterial map={vineTexture} transparent />
-      </mesh>
+      {/* Horizontal vine */}
+      {horizontalLength > 0 && (
+        <mesh
+          position={[(p2[0] + p3[0]) / 2, p2[1], 0]}
+          rotation={[0, 0, Math.PI / 2]}
+        >
+          <planeGeometry args={[2.5, horizontalLength]} />
+          <meshBasicMaterial map={vineTexture} transparent />
+        </mesh>
+      )}
     </>
   );
 };
