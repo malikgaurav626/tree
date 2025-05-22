@@ -109,41 +109,57 @@ const Node = ({ node, setSelectedNode, setIsZoomed }) => {
               zIndex: zoomed ? 1000 : "auto",
             }}
           >
-            <img
-              src={node.image || `https://robohash.org/${node.id}?size=100x100`}
-              alt={node.name}
-              style={{
-                width: zoomed ? "350px" : "100px",
-                borderRadius: "50%",
-                marginBottom: "10px",
-                transition: "width 0.4s ease-in-out",
-              }}
-            />
-            <strong>{node.name}</strong>
-            <p>Age: {node.age}</p>
-            <p>Status: {node.alive ? "Alive" : "Deceased"}</p>
-            <p>Occupation: {node.occupation}</p>
-            <p>Data: {node.data}</p>
-            {zoomed && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleZoomOut();
-                }}
+            <div className="card-image">
+              <img
+                src={
+                  node.image || `https://robohash.org/${node.id}?size=100x100`
+                }
+                alt={node.name}
                 style={{
-                  marginTop: "20px",
-                  padding: "12px 16px",
-                  background: "#222",
-                  color: "#ecf0f3",
-                  border: "2px solid #333",
-                  borderRadius: "8px",
-                  fontSize: "16px",
-                  cursor: "pointer",
+                  width: zoomed ? "350px" : "80px",
+                  borderRadius: "50%",
+                  marginBottom: "10px",
+                  transition: "width 0.4s ease-in-out",
                 }}
-              >
-                Back to Tree
-              </button>
-            )}
+              />
+              <strong style={
+                {
+                  opacity: zoomed ? 0 : 1,
+                }
+              }>{node.name}</strong>
+            </div>
+            <div className="card-content"
+            style={{
+              opacity: zoomed ? 1 : hovered ? 0.8 : 0.6,
+              transition: "opacity 0.4s ease-in-out",
+            }}
+            >
+              
+              <p>Age: {node.age}</p>
+              <p>Status: {node.alive ? "Alive" : "Deceased"}</p>
+              <p>Occupation: {node.occupation}</p>
+              <p>Data: {node.data}</p>
+              {zoomed && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleZoomOut();
+                  }}
+                  style={{
+                    marginTop: "20px",
+                    padding: "12px 16px",
+                    background: "#222",
+                    color: "#ecf0f3",
+                    border: "2px solid #333",
+                    borderRadius: "8px",
+                    fontSize: "16px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Back to Tree
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </Html>

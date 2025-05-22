@@ -61,12 +61,24 @@ body {
     backdrop-filter: blur(10px);
     box-shadow: 10px 10px 10px #cfd8e8, -10px -10px 10px #fdffff;
     border-radius: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
 
   }
   
   .card:hover {
     box-shadow: 12px 12px 10px #cfd8e8, -16px -16px 10px #fdffff;    
     border-radius: 30px;
+  }
+  .card-image{
+     width: 50%;
+  }
+  .card-image img{
+    
+    border-radius: 20px;
+    transition: transform 0.5s;
   }
   
   button {
